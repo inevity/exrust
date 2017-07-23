@@ -1,6 +1,6 @@
 //use std::env;
 //use std::fs::File;
-//use std::io::prelude::*;
+use std::io::prelude::*;
 //use std::process;
 //
 //use std::error::Error;
@@ -13,8 +13,15 @@ use greprs::Config;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
+    let mut stderr = std::io::stderr();
+
     let config = Config::new(&args).unwrap_or_else(|err| {
-        println!("Problem parsing arguments: {}", err);
+//        println!("Problem parsing arguments: {}", err);
+        writeln!(
+            &mut stderr,
+            "Problem parsing arguments: {}",
+            err
+        ).expect("Could not write to stderr");
         process::exit(1);
     });
 
@@ -22,7 +29,12 @@ fn main() {
     println!("In file {}", config.filename);
 
     if let Err(e) = greprs::run(config) {
-        println!("Application error: {}", e);
+        //println!("Application error: {}", e);
+        writeln!(
+            &mut stderr,
+            "Application error: {}",
+            e
+        ).expect("Could not write to stderr");
 
         process::exit(1);
     }
